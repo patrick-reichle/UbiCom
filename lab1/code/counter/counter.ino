@@ -8,6 +8,7 @@ void setup() {
   matrix.begin(0x70);
   matrix.setTextColor(LED_ON);
   matrix.setTextSize(1);
+  matrix.setRotation(1);
 }
  
 int count = 0; 

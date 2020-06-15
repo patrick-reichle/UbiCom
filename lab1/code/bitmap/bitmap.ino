@@ -37,6 +37,7 @@ void setup() {
   // put your setup code here, to run once:
   pinMode(4, INPUT_PULLUP); 
   matrix.begin(0x70);
+  matrix.setRotation(1);
   matrix.drawBitmap(0, 0, smile_bmp, 8, 8, LED_ON);
   matrix.writeDisplay();
   smile = true;
