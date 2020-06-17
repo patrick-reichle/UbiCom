@@ -1,12 +1,15 @@
+#include <Adafruit_LEDBackpack.h>
 #include <OneWire.h>
 
 // DS18S20 Temperature chip i/o
 OneWire ds(3);  // on pin 3
+Adafruit_8x16matrix matrix = Adafruit_8x16matrix();
 
 void setup(void) {
   // initialize inputs/outputs
   // start serial port
   Serial.begin(9600);
+  matrix.begin(0x70);
 }
 
 void loop(void) {
@@ -93,6 +96,19 @@ void loop(void) {
      Serial.print("0");
   }
   Serial.print(Fract);
-
   Serial.print("\n");
+  for (int i=0; i > -32; i--) {
+    matrix.clear();
+    matrix.setTextSize(1);
+    matrix.setTextWrap(false);
+    matrix.setTextColor(LED_ON);
+    matrix.setCursor(i,0);
+    if (SignBit) matrix.print('-');
+    matrix.print(Whole);
+    matrix.print('.');
+    matrix.print(Fract);
+    matrix.print("C");
+    matrix.writeDisplay();
+    delay(100);
+  }
 }
