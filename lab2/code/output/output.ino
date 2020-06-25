@@ -1,12 +1,11 @@
 #include <Wire.h>
 #include <SoftwareSerial.h>
 
+// only for debugging purpose
 SoftwareSerial mySerial(0,1);
-
 int red_light_pin= 9;
 int green_light_pin = 10;
 int blue_light_pin = 11;
-
 char command;
 
 
@@ -17,7 +16,7 @@ void setup() {
   pinMode(green_light_pin, OUTPUT);
   pinMode(blue_light_pin, OUTPUT);
   mySerial.begin(9600);
-  mySerial.println("Welcome");
+  mySerial.println("Debugging Terminal");
 }
 
 void loop() {
@@ -40,8 +39,8 @@ void loop() {
   }
 }
 
+// gets called when data is received
 void receiveCommand(int bytes) {
-  mySerial.println(bytes);
   byte enc = Wire.read();
   byte crc = Wire.read();
   byte check[] = {enc,crc};
@@ -49,8 +48,13 @@ void receiveCommand(int bytes) {
   if (res != 0) {
     mySerial.println("Received corrupted command!");
   } else {
+    mySerial.println("Package valid!");
+    mySerial.println("Encoded command received:");
     mySerial.println(enc, BIN);
+    mySerial.println("Received Checksum:");
     mySerial.println(crc, BIN);
+    
+    // decoding section
     if (enc == B00000001) {
       command = 'y'; // Yellow
     } else if (enc == B00000011) {
