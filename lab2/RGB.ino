@@ -26,6 +26,7 @@ void loop() {
     } else if (inChar == 'o') {
       RGB_color(0, 0, 0); // off
     } else {
+      mySerial.println();
       mySerial.println("Wrong command!");
     }
     
