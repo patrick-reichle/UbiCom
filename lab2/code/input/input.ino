@@ -23,7 +23,7 @@ void loop() {
     } else if (inChar == 'o') {
       sendCommand('o');
     } else {
-      mySerial.println("Wrong command!");
+      mySerial.println("Invalid command!");
     }
     
     mySerial.println("Enter new command: ");
@@ -48,17 +48,21 @@ byte encodeCommand(char cmd) {
   return B00000000;
 }
 
-byte CRC8(const byte *data, byte len) {
-  byte crc = 0x00;
-  while (len--) {
-    byte extract = *data++;
-    for (byte tempI = 8; tempI; tempI--) {
-      byte sum = (crc ^ extract) & 0x01;
-      crc >>= 1;
-      if (sum) {
-        crc ^= 0x8C;
+
+byte CRC8(byte* bytes, int len) {
+  const byte generator = 0x07;
+  byte crc = 0; /* start with 0 so first byte can be 'xored' in */
+
+  for (int j = 0; j < len; j++) {
+    crc ^= bytes[j]; /* XOR-in the next input byte */
+
+    for (int i = 0; i < 8; i++) {
+      if ((crc & 0x80) != 0) {
+        crc = (byte)((crc << 1) ^ generator);
       }
-      extract >>= 1;
+      else {
+        crc <<= 1;
+      }
     }
   }
   return crc;
@@ -66,10 +70,10 @@ byte CRC8(const byte *data, byte len) {
 
 void sendCommand(char cmd) {
  byte enc = encodeCommand(cmd);
- mySerial.println(enc, BIN);
- byte crc = CRC8(enc,1);
- mySerial.println(crc, BIN);
+ byte encArr[] = {enc};
+ byte crc = CRC8(encArr, 1);
+ byte data[] = {enc, crc};
  Wire.beginTransmission(9); // transmit to device #9
- Wire.write(enc);
+ Wire.write(data, 2);
  Wire.endTransmission(); 
 }
