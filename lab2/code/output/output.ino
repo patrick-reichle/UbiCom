@@ -23,7 +23,7 @@ void loop() {
 
 void receiveCommand(int bytes) {
   char inChar = Wire.read();
-  mySerial.println(inChar);
+  mySerial.println(inChar, BIN);
   if (inChar == B00000001) {
     RGB_color(255, 255, 0); // Yellow
   } else if (inChar == B00000011) {

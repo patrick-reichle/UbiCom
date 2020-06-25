@@ -30,6 +30,9 @@ void loop() {
   }
 }
 
+
+
+
 byte encodeCommand(char cmd) {
   if (cmd == 'y') {
     return B00000001;
@@ -45,9 +48,27 @@ byte encodeCommand(char cmd) {
   return B00000000;
 }
 
+byte CRC8(const byte *data, byte len) {
+  byte crc = 0x00;
+  while (len--) {
+    byte extract = *data++;
+    for (byte tempI = 8; tempI; tempI--) {
+      byte sum = (crc ^ extract) & 0x01;
+      crc >>= 1;
+      if (sum) {
+        crc ^= 0x8C;
+      }
+      extract >>= 1;
+    }
+  }
+  return crc;
+}
+
 void sendCommand(char cmd) {
  byte enc = encodeCommand(cmd);
- mySerial.print(enc); 
+ mySerial.println(enc, BIN);
+ byte crc = CRC8(enc,1);
+ mySerial.println(crc, BIN);
  Wire.beginTransmission(9); // transmit to device #9
  Wire.write(enc);
  Wire.endTransmission(); 
